@@ -1,30 +1,43 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
+import 'package:provider/provider.dart';
 import 'package:ui_tugas/main.dart';
+import 'package:ui_tugas/providers/theme_provider.dart';
+import 'package:ui_tugas/providers/user_provider.dart';
+import 'package:ui_tugas/providers/language_provider.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets('Test 3 State Global dan Navigasi Login ke Home', (WidgetTester tester) async {
+    // Build app dengan MultiProvider (3 State Global)
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (_) => ThemeProvider()),
+          ChangeNotifierProvider(create: (_) => UserProvider()),
+          ChangeNotifierProvider(create: (_) => LanguageProvider()),
+        ],
+        child: const MyApp(),
+      ),
+    );
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    // Verifikasi bahwa halaman login berhasil dirender
+    expect(find.text('Halaman Login'), findsOneWidget);
+    expect(find.text('Sign In'), findsOneWidget);
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
+    // Masukkan username
+    await tester.enterText(find.byType(TextField).first, 'Budi');
     await tester.pump();
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    // Pastikan tombol login terlihat lalu klik
+    final loginButton = find.text('Login');
+    await tester.ensureVisible(loginButton);
+    await tester.tap(loginButton);
+    await tester.pumpAndSettle();
+
+    // Verifikasi sudah pindah ke Home Page dan menampilkan nama dari UserProvider
+    expect(find.text('Halo, Budi!'), findsOneWidget);
+    expect(find.text('State 1: UserProvider'), findsOneWidget);
+    expect(find.text('State 2: ThemeProvider'), findsOneWidget);
+    expect(find.text('State 3: LanguageProvider'), findsOneWidget);
   });
 }
