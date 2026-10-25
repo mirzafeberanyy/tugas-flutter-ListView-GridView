@@ -43,3 +43,10 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Laporan & Dokumen Tambahan (Non-source code)
+*.docx
+~$*
+generate_report.py
+Laporan_Praktikum_ListView_dan_GridView.md
+
